@@ -44,8 +44,7 @@ export default function RootLayout({
       <html lang="en">
         <body>
           <header style={{ display: 'flex', justifyContent: 'space-between', padding: '20px', borderBottom: '1px solid #ccc' }}>
-            <Link href="/">Home</Link>
-            
+
             {/* 👤 UserButton handles sign-out and profile management */}
             <UserButton afterSignOutUrl="/" />
           </header>
