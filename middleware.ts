@@ -26,12 +26,12 @@ export default clerkMiddleware(async (auth, req) => {
   
   // If user is signed in and on landing page, redirect to dashboard
   if (userId && url.pathname === '/') {
-    return Response.redirect(new URL('/dashboard', req.url));
+    return Response.redirect(new URL('/setup', req.url));
   }
   
   // If user is signed in and trying to access sign-in/sign-up pages, redirect to dashboard
   if (userId && (url.pathname.startsWith('/sign-in') || url.pathname.startsWith('/sign-up'))) {
-    return Response.redirect(new URL('/dashboard', req.url));
+    return Response.redirect(new URL('/setup', req.url));
   }
   
   // If user is not signed in and trying to access protected routes, redirect to sign-in
