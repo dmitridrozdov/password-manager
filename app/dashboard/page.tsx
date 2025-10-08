@@ -116,7 +116,7 @@ export default function PasswordVaultDashboard() {
               <Shield className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">Password Vault</h1>
+              {/* <h1 className="text-3xl font-bold text-white">Password Vault</h1> */}
               <p className="text-slate-400 text-sm">{passwords.length} passwords stored securely</p>
             </div>
           </div>
