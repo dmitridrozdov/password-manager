@@ -1,34 +1,3 @@
-// import type { Metadata } from "next";
-// import { Montserrat } from "next/font/google";
-// import "./globals.css";
-// import ConvexClerkProvider from "./providers/ConvexClerkProvider";
-
-// const font = Montserrat({ subsets: ["latin"] });
-
-// export const metadata: Metadata = {
-//   title: "Password Manager",
-//   description: "A secure and user-friendly password manager application.",
-// };
-
-// export default function RootLayout({
-//   children,
-// }: Readonly<{
-//   children: React.ReactNode;
-// }>) {
-//   return (
-//     <html lang="en">
-//       <body className={font.className}>
-//         <ConvexClerkProvider>
-//           {children}
-//         </ConvexClerkProvider>
-//       </body>
-//     </html>
-//   );
-// }
-
-
-// app/layout.tsx
-
 import { ClerkProvider, UserButton } from '@clerk/nextjs'
 import './globals.css'
 import Link from 'next/link'
