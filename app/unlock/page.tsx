@@ -110,12 +110,6 @@ export default function MasterPasswordUnlock() {
             Your master password is never stored or sent to our servers. It's used only to decrypt your vault locally on your device.
           </p>
         </div>
-
-        <div className="mt-4 text-center">
-          <p className="text-xs text-slate-500">
-            Demo: Use "demo" as password to unlock
-          </p>
-        </div>
       </div>
     </div>
   );
