@@ -17,6 +17,7 @@ export default defineSchema({
     website: v.string(),
     username: v.string(),
     encryptedPassword: v.string(),
+    category: v.string(),
     iv: v.string(), // Initialization vector for this entry
     notes: v.optional(v.string()),
     createdAt: v.number(),
