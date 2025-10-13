@@ -2,37 +2,61 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
 // Get all passwords for a user
-export const getPasswords = query({
-  args: {
-    userId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const passwords = await ctx.db
-      .query("passwords")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
-      .order("desc")
-      .collect();
+// export const getPasswords = query({
+//   args: {
+//     userId: v.string(),
+//   },
+//   handler: async (ctx, args) => {
+//     const passwords = await ctx.db
+//       .query("passwords")
+//       .withIndex("by_user", (q) => q.eq("userId", args.userId))
+//       .order("desc")
+//       .collect();
 
-    return passwords;
+//     return passwords;
+//   },
+// });
+
+export const getPasswords = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return [];
+    }
+
+    return await ctx.db
+      .query("passwords")
+      .withIndex("by_user", (q) => q.eq("userId", identity.subject))
+      .collect();
   },
 });
 
 // Add a new password
 export const addPassword = mutation({
   args: {
-    userId: v.string(),
     website: v.string(),
     username: v.string(),
     encryptedPassword: v.string(),
+    category: v.string(),
     iv: v.string(),
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+      // For testing: use a hardcoded userId if not authenticated
+    // const userId = identity?.subject || "test-user-123";
+
     const passwordId = await ctx.db.insert("passwords", {
-      userId: args.userId,
+      userId: identity.subject,
       website: args.website,
       username: args.username,
       encryptedPassword: args.encryptedPassword,
+      category: args.category,
       iv: args.iv,
       notes: args.notes,
       createdAt: Date.now(),
@@ -44,31 +68,66 @@ export const addPassword = mutation({
 });
 
 // Update a password
+// export const updatePassword = mutation({
+//   args: {
+//     id: v.id("passwords"),
+//     userId: v.string(),
+//     website: v.optional(v.string()),
+//     username: v.optional(v.string()),
+//     encryptedPassword: v.optional(v.string()),
+//     category: v.optional(v.string()),
+//     iv: v.optional(v.string()),
+//     notes: v.optional(v.string()),
+//   },
+//   handler: async (ctx, args) => {
+//     const { id, userId, ...updates } = args;
+
+//     // Verify ownership
+//     const password = await ctx.db.get(id);
+//     if (!password || password.userId !== userId) {
+//       throw new Error("Password not found or unauthorized");
+//     }
+
+//     await ctx.db.patch(id, {
+//       ...updates,
+//       updatedAt: Date.now(),
+//     });
+
+//     return id;
+//   },
+// });
+
 export const updatePassword = mutation({
   args: {
     id: v.id("passwords"),
-    userId: v.string(),
-    website: v.optional(v.string()),
-    username: v.optional(v.string()),
-    encryptedPassword: v.optional(v.string()),
-    iv: v.optional(v.string()),
+    website: v.string(),
+    username: v.string(),
+    encryptedPassword: v.string(),
+    category: v.string(),
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const { id, userId, ...updates } = args;
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
 
-    // Verify ownership
-    const password = await ctx.db.get(id);
-    if (!password || password.userId !== userId) {
+    // Optional: Verify the password belongs to the current user
+    const existing = await ctx.db.get(args.id);
+    if (!existing || existing.userId !== identity.subject) {
       throw new Error("Password not found or unauthorized");
     }
 
-    await ctx.db.patch(id, {
-      ...updates,
+    await ctx.db.patch(args.id, {
+      website: args.website,
+      username: args.username,
+      encryptedPassword: args.encryptedPassword,
+      category: args.category,
+      notes: args.notes,
       updatedAt: Date.now(),
     });
 
-    return id;
+    return args.id;
   },
 });
 
