@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 import { Plus, Search, Eye, EyeOff, Copy, Trash2, Edit2, Lock, Globe, User, RefreshCw, X, Shield } from 'lucide-react';
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api"
+import { Id } from "@/convex/_generated/dataModel";
 
 // --- Utility Functions ---
 
@@ -104,14 +107,15 @@ export default function PasswordVaultDashboard() {
 
   // --- Existing State (Unchanged) ---
   const [passwords, setPasswords] = useState([
-    { id: 1, website: 'github.com', username: 'john@example.com', password: 'Gh#9kL2$pQ4x', category: 'work', notes: 'Development account' },
-    { id: 2, website: 'gmail.com', username: 'personal@gmail.com', password: 'Em@il2024!Sec', category: 'personal', notes: '' },
-    { id: 3, website: 'aws.amazon.com', username: 'admin@company.com', password: 'Aws$3cr3t#2024', category: 'work', notes: 'Production access' },
+    { id: '1' as Id<"passwords">, website: 'github.com', username: 'john@example.com', password: 'Gh#9kL2$pQ4x', category: 'work', notes: 'Development account' },
+    { id: '2' as Id<"passwords">, website: 'gmail.com', username: 'personal@gmail.com', password: 'Em@il2024!Sec', category: 'personal', notes: '' },
+    { id: '3' as Id<"passwords">, website: 'aws.amazon.com', username: 'admin@company.com', password: 'Aws$3cr3t#2024', category: 'work', notes: 'Production access' },
   ]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [visiblePasswords, setVisiblePasswords] = useState<Record<number, boolean>>({});
+  const [visiblePasswords, setVisiblePasswords] = useState<Record<Id<"passwords">, boolean>>({});
   const [showAddModal, setShowAddModal] = useState(false);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  // const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<Id<"passwords"> | null>(null);
   const [formData, setFormData] = useState({
     website: '',
     username: '',
@@ -127,7 +131,7 @@ export default function PasswordVaultDashboard() {
     p.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const togglePasswordVisibility = (id: number) => {
+  const togglePasswordVisibility = (id: Id<"passwords">) => {
     setVisiblePasswords(prev => ({
       ...prev,
       [id]: !prev[id]
@@ -152,27 +156,47 @@ export default function PasswordVaultDashboard() {
     setFormData(prev => ({ ...prev, password }));
   };
 
-  const handleSubmit = () => {
+  const addPassword = useMutation(api.passwords.addPassword);
+  const updatePassword = useMutation(api.passwords.updatePassword);
+
+  const handleSubmit = async () => {
     if (!formData.website || !formData.username || !formData.password) {
       alert('Please fill in all required fields');
       return;
     }
 
-    if (editingId) {
-      setPasswords(prev => prev.map(p => 
-        p.id === editingId ? { ...formData, id: editingId } : p
-      ));
-    } else {
-      setPasswords(prev => [...prev, { ...formData, id: Date.now() }]);
-    }
+    try {
+      if (editingId) {
+        await updatePassword({
+          id: editingId,
+          website: formData.website,
+          username: formData.username,
+          encryptedPassword: formData.password,
+          category: formData.category,
+          notes: formData.notes,
+        });
+      } else {
+        await addPassword({
+          website: formData.website,
+          username: formData.username,
+          encryptedPassword: formData.password,
+          category: formData.category,
+          notes: formData.notes,
+          iv: ''
+        });
+      }
 
-    setShowAddModal(false);
-    setEditingId(null);
-    setFormData({ website: '', username: '', password: '', category: 'personal', notes: '' });
+      setShowAddModal(false);
+      setEditingId(null);
+      setFormData({ website: '', username: '', password: '', category: 'personal', notes: '' });
+    } catch (error) {
+      alert('An error occurred while saving the password.');
+      console.error(error);
+    }
   };
 
   const handleEdit = (password: {
-    id: number;
+    id: Id<"passwords">;
     website: string;
     username: string;
     password: string;
@@ -184,7 +208,7 @@ export default function PasswordVaultDashboard() {
     setShowAddModal(true);
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: Id<"passwords">) => {
     if (confirm('Are you sure you want to delete this password?')) {
       setPasswords(prev => prev.filter(p => p.id !== id));
     }
@@ -238,6 +262,7 @@ export default function PasswordVaultDashboard() {
                   <Shield className="w-8 h-8 text-white" />
                 </div>
                 <div>
+                  <h1 className="text-3xl font-bold text-white">Password Vault</h1>
                   <p className="text-slate-400 text-sm">{passwords.length} passwords stored securely</p>
                 </div>
               </div>
