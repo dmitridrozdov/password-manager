@@ -243,7 +243,7 @@ export default function PasswordVaultDashboard() {
   // --- Render Logic (Modified) ---
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
       <div className="max-w-6xl mx-auto">
         
         {/* Master Password Modal (Appears when locked) */}
