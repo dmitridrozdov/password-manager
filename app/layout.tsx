@@ -67,7 +67,7 @@ export default function RootLayout({
     >
       <ConvexClerkProvider>
         <html lang="en" suppressHydrationWarning>
-          <body className="bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900" suppressHydrationWarning>
+          <body className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" suppressHydrationWarning>
             <header className="border-b border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
               <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                 
