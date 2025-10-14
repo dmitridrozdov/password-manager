@@ -1,10 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus, Search, Eye, EyeOff, Copy, Trash2, Edit2, Lock, Globe, User, RefreshCw, X, Shield } from 'lucide-react';
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel";
+
+type Password = {
+  _id: Id<"passwords">;  // Change from 'id' to '_id'
+  website: string;
+  username: string;
+  encryptedPassword: string;
+  category: string;
+  iv: string;
+  notes?: string;
+  createdAt: number;
+  updatedAt: number;
+  userId: string;
+};
 
 // --- Utility Functions ---
 
@@ -105,12 +118,18 @@ export default function PasswordVaultDashboard() {
   };
 
 
-  // --- Existing State (Unchanged) ---
-  const [passwords, setPasswords] = useState([
-    { id: '1' as Id<"passwords">, website: 'github.com', username: 'john@example.com', password: 'Gh#9kL2$pQ4x', category: 'work', notes: 'Development account' },
-    { id: '2' as Id<"passwords">, website: 'gmail.com', username: 'personal@gmail.com', password: 'Em@il2024!Sec', category: 'personal', notes: '' },
-    { id: '3' as Id<"passwords">, website: 'aws.amazon.com', username: 'admin@company.com', password: 'Aws$3cr3t#2024', category: 'work', notes: 'Production access' },
-  ]);
+  const passwordsFromDB = useQuery(api.passwords.getPasswords);
+  const [passwords, setPasswords] = useState<Password[]>(passwordsFromDB ?? []);
+
+
+  // Update the useEffect to sync when data loads
+  useEffect(() => {
+    if (passwordsFromDB) {
+      setPasswords(passwordsFromDB);
+    }
+  }, [passwordsFromDB]);
+
+
   const [searchTerm, setSearchTerm] = useState('');
   const [visiblePasswords, setVisiblePasswords] = useState<Record<Id<"passwords">, boolean>>({});
   const [showAddModal, setShowAddModal] = useState(false);
@@ -210,7 +229,7 @@ export default function PasswordVaultDashboard() {
 
   const handleDelete = (id: Id<"passwords">) => {
     if (confirm('Are you sure you want to delete this password?')) {
-      setPasswords(prev => prev.filter(p => p.id !== id));
+      setPasswords(prev => prev.filter(p => p._id !== id));
     }
   };
 
@@ -302,7 +321,7 @@ export default function PasswordVaultDashboard() {
             {/* Password List */}
             <div className="grid gap-4">
               {filteredPasswords.map((pwd) => (
-                <div key={pwd.id} className="bg-slate-800 border border-slate-700 rounded-lg p-6 hover:border-slate-600 transition-colors">
+                <div key={pwd._id} className="bg-slate-800 border border-slate-700 rounded-lg p-6 hover:border-slate-600 transition-colors">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className="bg-slate-700 p-3 rounded-lg">
@@ -317,13 +336,20 @@ export default function PasswordVaultDashboard() {
                     </div>
                     <div className="flex gap-2">
                       <button
-                        onClick={() => handleEdit(pwd)}
+                        onClick={() => handleEdit({
+                          id: pwd._id,
+                          website: pwd.website,
+                          username: pwd.username,
+                          password: pwd.encryptedPassword,
+                          category: pwd.category,
+                          notes: pwd.notes ?? ''
+                        })}
                         className="p-2 text-slate-400 hover:text-blue-400 hover:bg-slate-700 rounded-lg transition-colors"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(pwd.id)}
+                        onClick={() => handleDelete(pwd._id)}
                         className="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-700 rounded-lg transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -346,16 +372,16 @@ export default function PasswordVaultDashboard() {
                     <div className="flex items-center gap-3">
                       <Lock className="w-4 h-4 text-slate-400" />
                       <span className="text-slate-300 flex-1 font-mono">
-                        {visiblePasswords[pwd.id] ? pwd.password : '••••••••••••'}
+                        {visiblePasswords[pwd._id] ? pwd.encryptedPassword : '••••••••••••'}
                       </span>
                       <button
-                        onClick={() => togglePasswordVisibility(pwd.id)}
+                        onClick={() => togglePasswordVisibility(pwd._id)}
                         className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors"
                       >
-                        {visiblePasswords[pwd.id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {visiblePasswords[pwd._id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                       <button
-                        onClick={() => copyToClipboard(pwd.password, 'Password')}
+                        onClick={() => copyToClipboard(pwd.encryptedPassword, 'Password')}
                         className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors"
                       >
                         <Copy className="w-4 h-4" />
