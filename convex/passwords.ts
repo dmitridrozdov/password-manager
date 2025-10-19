@@ -67,36 +67,6 @@ export const addPassword = mutation({
   },
 });
 
-// Update a password
-// export const updatePassword = mutation({
-//   args: {
-//     id: v.id("passwords"),
-//     userId: v.string(),
-//     website: v.optional(v.string()),
-//     username: v.optional(v.string()),
-//     encryptedPassword: v.optional(v.string()),
-//     category: v.optional(v.string()),
-//     iv: v.optional(v.string()),
-//     notes: v.optional(v.string()),
-//   },
-//   handler: async (ctx, args) => {
-//     const { id, userId, ...updates } = args;
-
-//     // Verify ownership
-//     const password = await ctx.db.get(id);
-//     if (!password || password.userId !== userId) {
-//       throw new Error("Password not found or unauthorized");
-//     }
-
-//     await ctx.db.patch(id, {
-//       ...updates,
-//       updatedAt: Date.now(),
-//     });
-
-//     return id;
-//   },
-// });
-
 export const updatePassword = mutation({
   args: {
     id: v.id("passwords"),
@@ -132,15 +102,20 @@ export const updatePassword = mutation({
 });
 
 // Delete a password
+// Delete a password
 export const deletePassword = mutation({
   args: {
     id: v.id("passwords"),
-    userId: v.string(),
   },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    // Verify the password belongs to the current user
     const password = await ctx.db.get(args.id);
-    
-    if (!password || password.userId !== args.userId) {
+    if (!password || password.userId !== identity.subject) {
       throw new Error("Password not found or unauthorized");
     }
 
