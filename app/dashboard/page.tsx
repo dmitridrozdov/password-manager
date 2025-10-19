@@ -121,6 +121,8 @@ export default function PasswordVaultDashboard() {
   const passwordsFromDB = useQuery(api.passwords.getPasswords);
   const [passwords, setPasswords] = useState<Password[]>(passwordsFromDB ?? []);
 
+  const deletePassword = useMutation(api.passwords.deletePassword);
+
 
   // Update the useEffect to sync when data loads
   useEffect(() => {
@@ -227,11 +229,11 @@ export default function PasswordVaultDashboard() {
     setShowAddModal(true);
   };
 
-  const handleDelete = (id: Id<"passwords">) => {
-    if (confirm('Are you sure you want to delete this password?')) {
-      setPasswords(prev => prev.filter(p => p._id !== id));
-    }
-  };
+const handleDelete = (id: Id<"passwords">) => {
+  if (confirm('Are you sure you want to delete this password?')) {
+    deletePassword({ id });
+  }
+};
 
   const openAddModal = () => {
     setFormData({ website: '', username: '', password: '', category: 'personal', notes: '' });
