@@ -161,7 +161,6 @@ export default function PasswordVaultDashboard() {
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    alert(`${label} copied to clipboard!`);
   };
 
   const generatePassword = () => {
