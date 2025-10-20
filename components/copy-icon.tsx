@@ -8,7 +8,7 @@ export const CopyIcon = ({ result = '' }: { result: string }) => {
     try {
       await navigator.clipboard.writeText(textToCopy);
       setIsClick(true);
-      setTimeout(() => {setIsClick(false)}, 3000); // Reset after 3 seconds
+      setTimeout(() => {setIsClick(false)}, 2000); // Reset after 3 seconds
     } catch (err) {
       setIsClick(false);
     }
