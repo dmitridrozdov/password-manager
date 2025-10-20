@@ -5,6 +5,7 @@ import { Plus, Search, Eye, EyeOff, Copy, Trash2, Edit2, Lock, Globe, User, Refr
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel";
+import { CopyIcon } from '@/components/copy-icon';
 
 type Password = {
   _id: Id<"passwords">;  // Change from 'id' to '_id'
@@ -366,7 +367,7 @@ const handleDelete = (id: Id<"passwords">) => {
                         onClick={() => copyToClipboard(pwd.username, 'Username')}
                         className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors"
                       >
-                        <Copy className="w-4 h-4" />
+                        <CopyIcon result=''/>
                       </button>
                     </div>
 
@@ -385,7 +386,7 @@ const handleDelete = (id: Id<"passwords">) => {
                         onClick={() => copyToClipboard(pwd.encryptedPassword, 'Password')}
                         className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors"
                       >
-                        <Copy className="w-4 h-4" />
+                        <CopyIcon result=''/>
                       </button>
                     </div>
 
