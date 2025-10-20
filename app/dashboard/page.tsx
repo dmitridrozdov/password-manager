@@ -127,6 +127,7 @@ export default function PasswordVaultDashboard() {
 
   // Update the useEffect to sync when data loads
   useEffect(() => {
+    console.log('masterPasswordInput:', masterPasswordInput) // For debugging
     if (passwordsFromDB) {
       setPasswords(passwordsFromDB);
     }
