@@ -7,6 +7,8 @@ import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel";
 import { CopyIcon } from '@/components/copy-icon';
 
+import { EncryptionService } from '@/lib/encryption';
+
 type Password = {
   _id: Id<"passwords">;  // Change from 'id' to '_id'
   website: string;
@@ -102,37 +104,112 @@ function MasterPasswordModal({ onUnlock }: { onUnlock: (password: string) => voi
 export default function PasswordVaultDashboard() {
   // Master password is now successfully stored on *any* non-empty entry
   const [isVaultLocked, setIsVaultLocked] = useState(true);
-  const [masterPasswordInput, setMasterPasswordInput] = useState('');
+  // const [masterPasswordInput, setMasterPasswordInput] = useState('');
   // Removed isUnlockError state
 
   // --- Lock/Unlock Logic (Simplified) ---
   const handleUnlockAttempt = (password: string) => {
     // ⭐️ Simplified logic: any entered password successfully unlocks the vault
-    setMasterPasswordInput(password); // ⭐️ Stores the entered password in state
+    // setMasterPasswordInput(password); // ⭐️ Stores the entered password in state
     setIsVaultLocked(false);        // ⭐️ Unlocks the vault
+    initialiseEncryptionKey(password);      // ⭐️ Initializes encryption key
   };
 
   const lockVault = () => {
     setIsVaultLocked(true);
-    setMasterPasswordInput('');
+    // setMasterPasswordInput('');
     // Any other state reset can go here
   };
 
 
   const passwordsFromDB = useQuery(api.passwords.getPasswords);
   const [passwords, setPasswords] = useState<Password[]>(passwordsFromDB ?? []);
+  const [encryptionKey, setEncryptionKey] = useState<CryptoKey | null>(null);
 
   const deletePassword = useMutation(api.passwords.deletePassword);
 
 
   // Update the useEffect to sync when data loads
   useEffect(() => {
-    console.log('masterPasswordInput:', masterPasswordInput) // For debugging
     if (passwordsFromDB) {
       setPasswords(passwordsFromDB);
     }
   }, [passwordsFromDB]);
 
+
+   // Initialize encryption key from session
+  // const initialiseEncryptionKey = (password: string) => {
+  //   const initializeKey = async () => {
+  //     // const keyString = sessionStorage.getItem('vaultKey');
+  //     console.log('Initializing encryption key with password: ', password); // For debugging
+  //     if (!password) {
+  //       alert('Vault is locked. Please unlock first.');
+  //       return;
+  //     }
+
+  //     try {
+  //       const keyBuffer = EncryptionService.base64ToArrayBuffer(password);
+  //       const key = await crypto.subtle.importKey(
+  //         'raw',
+  //         keyBuffer,
+  //         { name: 'AES-GCM', length: 256 },
+  //         true,
+  //         ['encrypt', 'decrypt']
+  //       );
+  //       setEncryptionKey(key);
+  //     } catch (error) {
+  //       console.error('Failed to initialize encryption key:', error);
+  //       alert('Failed to initialize encryption. Please unlock vault again.');
+  //     }
+  //   };
+
+  //   initializeKey();
+  // };
+
+  const initialiseEncryptionKey = async (password: string) => {
+    console.log('Initializing encryption key');
+    
+    if (!password) {
+      alert('Vault is locked. Please unlock first.');
+      return;
+    }
+
+    try {
+      // Try to get existing salt from storage
+      let salt: Uint8Array;
+      
+      // Check if window.storage is available
+      if (typeof window !== 'undefined' && window.storage) {
+        const storedSalt = await window.storage.get('vault_salt');
+        
+        if (storedSalt) {
+          // Use existing salt - convert ArrayBuffer to Uint8Array
+          const saltBuffer = EncryptionService.base64ToArrayBuffer(storedSalt.value);
+          salt = new Uint8Array(saltBuffer);
+          console.log('Using existing salt from storage');
+        } else {
+          // Generate new salt (first time setup)
+          salt = crypto.getRandomValues(new Uint8Array(16));
+          const saltBase64 = EncryptionService.arrayBufferToBase64(salt.buffer as ArrayBuffer);
+          await window.storage.set('vault_salt', saltBase64, false);
+          console.log('Generated and stored new salt');
+        }
+      } else {
+        // Fallback: generate salt each time (WARNING: this means data won't persist!)
+        console.warn('window.storage not available, using temporary salt');
+        salt = crypto.getRandomValues(new Uint8Array(16));
+      }
+      
+      // Use your existing deriveKey function
+      const key = await EncryptionService.deriveKey(password, salt);
+      
+      setEncryptionKey(key);
+      console.log('Encryption key initialized successfully');
+    } catch (error) {
+      console.error('Failed to initialize encryption key:', error);
+      alert('Failed to initialize encryption. Please try again.');
+    }
+  };
 
   const [searchTerm, setSearchTerm] = useState('');
   const [visiblePasswords, setVisiblePasswords] = useState<Record<Id<"passwords">, boolean>>({});
@@ -187,13 +264,25 @@ export default function PasswordVaultDashboard() {
       return;
     }
 
+    if (!encryptionKey) {
+      alert('Vault is locked. Please unlock first.');
+      return;
+    }
+
     try {
+      // Encrypt the password using the master password-derived key
+      const { encrypted, iv } = await EncryptionService.encrypt(
+        formData.password,
+        encryptionKey
+      );
+
       if (editingId) {
         await updatePassword({
           id: editingId,
           website: formData.website,
           username: formData.username,
-          encryptedPassword: formData.password,
+          encryptedPassword: encrypted,
+          iv: iv,
           category: formData.category,
           notes: formData.notes,
         });
@@ -201,10 +290,10 @@ export default function PasswordVaultDashboard() {
         await addPassword({
           website: formData.website,
           username: formData.username,
-          encryptedPassword: formData.password,
+          encryptedPassword: encrypted,
+          iv: iv,
           category: formData.category,
           notes: formData.notes,
-          iv: ''
         });
       }
 
@@ -216,6 +305,89 @@ export default function PasswordVaultDashboard() {
       console.error(error);
     }
   };
+
+  const handleDecryptPassword = async (password: {
+    encryptedPassword: string;
+    iv: string;
+  }) => {
+    if (!encryptionKey) {
+      alert('Vault is locked. Please unlock first.');
+      return null;
+    }
+
+    try {
+      const decrypted = await EncryptionService.decrypt(
+        password.encryptedPassword,
+        encryptionKey,
+        password.iv
+      );
+      return decrypted;
+    } catch (error) {
+      console.error('Failed to decrypt password:', error);
+      alert('Failed to decrypt password. The vault may have been locked with a different master password.');
+      return null;
+    }
+  };
+
+  //   const handleSubmit = async () => {
+  //   // Validation
+  //   if (!formData.website || !formData.username || !formData.password) {
+  //     alert('Please fill in all required fields');
+  //     return;
+  //   }
+
+  //   if (!encryptionKey) {
+  //     alert('Encryption key not available. Please unlock vault first.');
+  //     return;
+  //   }
+
+  //   try {
+  //     // Encrypt the password using encryption service
+  //     const { encrypted, iv } = await EncryptionService.encrypt(
+  //       formData.password,
+  //       encryptionKey
+  //     );
+
+  //     if (editingId) {
+  //       // UPDATE existing password
+  //       await updatePassword({
+  //         id: editingId,
+  //         website: formData.website,
+  //         username: formData.username,
+  //         encryptedPassword: encrypted,
+  //         iv: iv,
+  //         category: formData.category,
+  //         notes: formData.notes,
+  //       });
+  //     } else {
+  //       // ADD new password
+  //       await addPassword({
+  //         website: formData.website,
+  //         username: formData.username,
+  //         encryptedPassword: encrypted,
+  //         iv: iv,
+  //         category: formData.category,
+  //         notes: formData.notes,
+  //       });
+  //     }
+
+  //     // Reset form
+  //     setShowAddModal(false);
+  //     setEditingId(null);
+  //     setFormData({ 
+  //       website: '', 
+  //       username: '', 
+  //       password: '', 
+  //       category: 'personal', 
+  //       notes: '' 
+  //     });
+      
+  //     alert('Password saved successfully!');
+  //   } catch (error) {
+  //     alert('An error occurred while saving the password.');
+  //     console.error('Encryption error:', error);
+  //   }
+  // };
 
   const handleEdit = (password: {
     id: Id<"passwords">;
