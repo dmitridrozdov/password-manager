@@ -14,7 +14,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as passwords from "../passwords.js";
-import type * as vaultKeys from "../vaultKeys.js";
+import type * as vaultSettings from "../vaultSettings.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -26,7 +26,7 @@ import type * as vaultKeys from "../vaultKeys.js";
  */
 declare const fullApi: ApiFromModules<{
   passwords: typeof passwords;
-  vaultKeys: typeof vaultKeys;
+  vaultSettings: typeof vaultSettings;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,
