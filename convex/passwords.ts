@@ -1,25 +1,10 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
-// Get all passwords for a user
-// export const getPasswords = query({
-//   args: {
-//     userId: v.string(),
-//   },
-//   handler: async (ctx, args) => {
-//     const passwords = await ctx.db
-//       .query("passwords")
-//       .withIndex("by_user", (q) => q.eq("userId", args.userId))
-//       .order("desc")
-//       .collect();
-
-//     return passwords;
-//   },
-// });
-
 export const getPasswords = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
+    // console.log("Fetching passwords for user:", identity?.subject);
     if (!identity) {
       return [];
     }
@@ -51,6 +36,8 @@ export const addPassword = mutation({
       // For testing: use a hardcoded userId if not authenticated
     // const userId = identity?.subject || "test-user-123";
 
+    // console.log("Adding password for user:", identity.subject);
+
     const passwordId = await ctx.db.insert("passwords", {
       userId: identity.subject,
       website: args.website,
@@ -73,6 +60,7 @@ export const updatePassword = mutation({
     website: v.string(),
     username: v.string(),
     encryptedPassword: v.string(),
+    iv: v.string(),
     category: v.string(),
     notes: v.optional(v.string()),
   },
