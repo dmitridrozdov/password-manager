@@ -207,45 +207,57 @@ export default function PasswordVaultDashboard() {
   };
 
   // Modified toggle function to decrypt on first view
-  const togglePasswordVisibility = async (id: string) => {
-    // If already visible, just hide it
-    if (visiblePasswords[id]) {
-      setVisiblePasswords(prev => ({ ...prev, [id]: false }));
+ const togglePasswordVisibility = async (id: string) => {
+  if (visiblePasswords[id]) {
+    setVisiblePasswords(prev => ({ ...prev, [id]: false }));
+    return;
+  }
+
+  if (!decryptedPasswords[id]) {
+    if (!encryptionKey) {
+      alert('Vault is locked. Please unlock first.');
       return;
     }
 
-    // If not decrypted yet, decrypt it
-    if (!decryptedPasswords[id]) {
-      if (!encryptionKey) {
-        alert('Vault is locked. Please unlock first.');
+    try {
+      const password = passwordsFromDB?.find(p => p._id === id);
+      if (!password) {
+        alert('Password not found');
         return;
       }
 
-      try {
-        const password = passwordsFromDB?.find(p => p._id === id);
-        if (!password) {
-          alert('Password not found');
-          return;
-        }
+      // DEBUG: Log the data
+      console.log('Attempting to decrypt:', {
+        id: password._id,
+        website: password.website,
+        encryptedPassword: password.encryptedPassword,
+        iv: password.iv,
+        ivLength: password.iv?.length,
+        ivEmpty: password.iv === ''
+      });
 
-        const decrypted = await EncryptionService.decrypt(
-          password.encryptedPassword,
-          encryptionKey,
-          password.iv
-        );
-
-        // Store the decrypted password
-        setDecryptedPasswords(prev => ({ ...prev, [id]: decrypted }));
-      } catch (error) {
-        console.error('Failed to decrypt password:', error);
-        alert('Failed to decrypt password. Please check your master password.');
+      // Check if IV is valid
+      if (!password.iv || password.iv === '') {
+        alert('This password was saved without encryption. Please delete and re-add it.');
         return;
       }
+
+      const decrypted = await EncryptionService.decrypt(
+        password.encryptedPassword,
+        encryptionKey,
+        password.iv
+      );
+
+      setDecryptedPasswords(prev => ({ ...prev, [id]: decrypted }));
+    } catch (error) {
+      console.error('Failed to decrypt password:', error);
+      alert('Failed to decrypt password. This password may have been corrupted or saved with old code. Please delete and re-add it.');
+      return;
     }
+  }
 
-    // Show the password
-    setVisiblePasswords(prev => ({ ...prev, [id]: true }));
-  };
+  setVisiblePasswords(prev => ({ ...prev, [id]: true }));
+};
 
   // Modified copy function to decrypt before copying
   const copyPasswordToClipboard = async (id: string) => {
@@ -324,8 +336,8 @@ export default function PasswordVaultDashboard() {
           id: editingId,
           website: formData.website,
           username: formData.username,
-          encryptedPassword: encrypted,
-          iv: iv,
+          encryptedPassword: encrypted, // ← Now properly encrypted
+          iv: iv, // ← Now has the actual IV
           category: formData.category,
           notes: formData.notes,
         });
@@ -333,8 +345,8 @@ export default function PasswordVaultDashboard() {
         await addPassword({
           website: formData.website,
           username: formData.username,
-          encryptedPassword: encrypted,
-          iv: iv,
+          encryptedPassword: encrypted, // ← Now properly encrypted
+          iv: iv, // ← Now has the actual IV
           category: formData.category,
           notes: formData.notes,
         });
@@ -527,7 +539,7 @@ const handleDelete = (id: Id<"passwords">) => {
                       </button>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    {/* <div className="flex items-center gap-3">
                       <Lock className="w-4 h-4 text-slate-400" />
                       <span className="text-slate-300 flex-1 font-mono">
                         {visiblePasswords[pwd._id] ? pwd.encryptedPassword : '••••••••••••'}
@@ -540,6 +552,28 @@ const handleDelete = (id: Id<"passwords">) => {
                       </button>
                       <button
                         onClick={() => copyToClipboard(pwd.encryptedPassword, 'Password')}
+                        className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors"
+                      >
+                        <CopyIcon result=''/>
+                      </button>
+                    </div> */}
+
+                    <div className="flex items-center gap-3">
+                      <Lock className="w-4 h-4 text-slate-400" />
+                      <span className="text-slate-300 flex-1 font-mono">
+                        {visiblePasswords[pwd._id] 
+                          ? (decryptedPasswords[pwd._id] || 'Decrypting...') 
+                          : '••••••••••••'
+                        }
+                      </span>
+                      <button
+                        onClick={() => togglePasswordVisibility(pwd._id)}
+                        className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors"
+                      >
+                        {visiblePasswords[pwd._id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                      <button
+                        onClick={() => copyPasswordToClipboard(pwd._id)}
                         className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors"
                       >
                         <CopyIcon result=''/>
