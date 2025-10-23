@@ -4,12 +4,12 @@ import { v } from "convex/values";
 
 export default defineSchema({
   // Store user's encrypted encryption key
-  vaultKeys: defineTable({
-    userId: v.string(), // Clerk user ID
-    encryptedMasterKey: v.string(), // Master key encrypted with password
-    salt: v.string(), // For key derivation
-    iv: v.string(), // Initialization vector
-  }).index("by_user", ["userId"]),
+  // vaultKeys: defineTable({
+  //   userId: v.string(), // Clerk user ID
+  //   encryptedMasterKey: v.string(), // Master key encrypted with password
+  //   salt: v.string(), // For key derivation
+  //   iv: v.string(), // Initialization vector
+  // }).index("by_user", ["userId"]),
   
   // Store encrypted passwords
   passwords: defineTable({
@@ -22,5 +22,12 @@ export default defineSchema({
     notes: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
+  }).index("by_user", ["userId"]),
+
+  // Add this table for storing the salt
+  vaultSettings: defineTable({
+    userId: v.string(),
+    salt: v.string(),
+    createdAt: v.number(),
   }).index("by_user", ["userId"]),
 });
