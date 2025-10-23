@@ -102,25 +102,18 @@ function MasterPasswordModal({ onUnlock }: { onUnlock: (password: string) => voi
 // --- Main Component (Modified) ---
 
 export default function PasswordVaultDashboard() {
-  // Master password is now successfully stored on *any* non-empty entry
   const [isVaultLocked, setIsVaultLocked] = useState(true);
-  // const [masterPasswordInput, setMasterPasswordInput] = useState('');
-  // Removed isUnlockError state
 
   // --- Lock/Unlock Logic (Simplified) ---
   const handleUnlockAttempt = (password: string) => {
     // ⭐️ Simplified logic: any entered password successfully unlocks the vault
-    // setMasterPasswordInput(password); // ⭐️ Stores the entered password in state
     setIsVaultLocked(false);        // ⭐️ Unlocks the vault
     initialiseEncryptionKey(password);      // ⭐️ Initializes encryption key
   };
 
   const lockVault = () => {
     setIsVaultLocked(true);
-    // setMasterPasswordInput('');
-    // Any other state reset can go here
   };
-
 
   const passwordsFromDB = useQuery(api.passwords.getPasswords);
   const [passwords, setPasswords] = useState<Password[]>(passwordsFromDB ?? []);
@@ -128,43 +121,12 @@ export default function PasswordVaultDashboard() {
 
   const deletePassword = useMutation(api.passwords.deletePassword);
 
-
   // Update the useEffect to sync when data loads
   useEffect(() => {
     if (passwordsFromDB) {
       setPasswords(passwordsFromDB);
     }
   }, [passwordsFromDB]);
-
-
-   // Initialize encryption key from session
-  // const initialiseEncryptionKey = (password: string) => {
-  //   const initializeKey = async () => {
-  //     // const keyString = sessionStorage.getItem('vaultKey');
-  //     console.log('Initializing encryption key with password: ', password); // For debugging
-  //     if (!password) {
-  //       alert('Vault is locked. Please unlock first.');
-  //       return;
-  //     }
-
-  //     try {
-  //       const keyBuffer = EncryptionService.base64ToArrayBuffer(password);
-  //       const key = await crypto.subtle.importKey(
-  //         'raw',
-  //         keyBuffer,
-  //         { name: 'AES-GCM', length: 256 },
-  //         true,
-  //         ['encrypt', 'decrypt']
-  //       );
-  //       setEncryptionKey(key);
-  //     } catch (error) {
-  //       console.error('Failed to initialize encryption key:', error);
-  //       alert('Failed to initialize encryption. Please unlock vault again.');
-  //     }
-  //   };
-
-  //   initializeKey();
-  // };
 
   const initialiseEncryptionKey = async (password: string) => {
     console.log('Initializing encryption key');
@@ -328,66 +290,6 @@ export default function PasswordVaultDashboard() {
       return null;
     }
   };
-
-  //   const handleSubmit = async () => {
-  //   // Validation
-  //   if (!formData.website || !formData.username || !formData.password) {
-  //     alert('Please fill in all required fields');
-  //     return;
-  //   }
-
-  //   if (!encryptionKey) {
-  //     alert('Encryption key not available. Please unlock vault first.');
-  //     return;
-  //   }
-
-  //   try {
-  //     // Encrypt the password using encryption service
-  //     const { encrypted, iv } = await EncryptionService.encrypt(
-  //       formData.password,
-  //       encryptionKey
-  //     );
-
-  //     if (editingId) {
-  //       // UPDATE existing password
-  //       await updatePassword({
-  //         id: editingId,
-  //         website: formData.website,
-  //         username: formData.username,
-  //         encryptedPassword: encrypted,
-  //         iv: iv,
-  //         category: formData.category,
-  //         notes: formData.notes,
-  //       });
-  //     } else {
-  //       // ADD new password
-  //       await addPassword({
-  //         website: formData.website,
-  //         username: formData.username,
-  //         encryptedPassword: encrypted,
-  //         iv: iv,
-  //         category: formData.category,
-  //         notes: formData.notes,
-  //       });
-  //     }
-
-  //     // Reset form
-  //     setShowAddModal(false);
-  //     setEditingId(null);
-  //     setFormData({ 
-  //       website: '', 
-  //       username: '', 
-  //       password: '', 
-  //       category: 'personal', 
-  //       notes: '' 
-  //     });
-      
-  //     alert('Password saved successfully!');
-  //   } catch (error) {
-  //     alert('An error occurred while saving the password.');
-  //     console.error('Encryption error:', error);
-  //   }
-  // };
 
   const handleEdit = (password: {
     id: Id<"passwords">;
