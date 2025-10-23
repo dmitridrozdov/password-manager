@@ -119,6 +119,9 @@ export default function PasswordVaultDashboard() {
   const [passwords, setPasswords] = useState<Password[]>(passwordsFromDB ?? []);
   const [encryptionKey, setEncryptionKey] = useState<CryptoKey | null>(null);
 
+  const saltFromDB = useQuery(api.vaultSettings.getSalt);
+  const setSaltInDB = useMutation(api.vaultSettings.setSalt);
+
   const deletePassword = useMutation(api.passwords.deletePassword);
 
   // Update the useEffect to sync when data loads
@@ -137,29 +140,26 @@ export default function PasswordVaultDashboard() {
     }
 
     try {
-      // Try to get existing salt from storage
       let salt: Uint8Array;
       
-      // Check if window.storage is available
-      if (typeof window !== 'undefined' && window.storage) {
-        const storedSalt = await window.storage.get('vault_salt');
-        
-        if (storedSalt) {
-          // Use existing salt - convert ArrayBuffer to Uint8Array
-          const saltBuffer = EncryptionService.base64ToArrayBuffer(storedSalt.value);
-          salt = new Uint8Array(saltBuffer);
-          console.log('Using existing salt from storage');
-        } else {
-          // Generate new salt (first time setup)
-          salt = crypto.getRandomValues(new Uint8Array(16));
-          const saltBase64 = EncryptionService.arrayBufferToBase64(salt.buffer as ArrayBuffer);
-          await window.storage.set('vault_salt', saltBase64, false);
-          console.log('Generated and stored new salt');
-        }
+      if (saltFromDB) {
+        // Use existing salt from database
+        const saltBuffer = EncryptionService.base64ToArrayBuffer(saltFromDB);
+        salt = new Uint8Array(saltBuffer);
+        console.log('Using existing salt from database');
       } else {
-        // Fallback: generate salt each time (WARNING: this means data won't persist!)
-        console.warn('window.storage not available, using temporary salt');
+        // Generate new salt (first time setup)
         salt = crypto.getRandomValues(new Uint8Array(16));
+        const saltBase64 = EncryptionService.arrayBufferToBase64(salt.buffer as ArrayBuffer);
+        
+        try {
+          await setSaltInDB({ salt: saltBase64 });
+          console.log('Generated and stored new salt in database');
+        } catch (error) {
+          console.error('Failed to store salt in database:', error);
+          alert('Failed to initialize vault. Please try again.');
+          return;
+        }
       }
       
       // Use your existing deriveKey function
