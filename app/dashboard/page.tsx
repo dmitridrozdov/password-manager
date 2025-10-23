@@ -174,9 +174,8 @@ export default function PasswordVaultDashboard() {
   };
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [visiblePasswords, setVisiblePasswords] = useState<Record<Id<"passwords">, boolean>>({});
+  // const [visiblePasswords, setVisiblePasswords] = useState<Record<Id<"passwords">, boolean>>({});
   const [showAddModal, setShowAddModal] = useState(false);
-  // const [editingId, setEditingId] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<Id<"passwords"> | null>(null);
   const [formData, setFormData] = useState({
     website: '',
@@ -187,35 +186,117 @@ export default function PasswordVaultDashboard() {
   });
   const [showFormPassword, setShowFormPassword] = useState(false);
 
+  const [visiblePasswords, setVisiblePasswords] = useState<Record<string, boolean>>({});
+  const [decryptedPasswords, setDecryptedPasswords] = useState<Record<string, string>>({});
+
   // --- Existing Logic (Unchanged) ---
   const filteredPasswords = passwords.filter(p => 
     p.website.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const togglePasswordVisibility = (id: Id<"passwords">) => {
-    setVisiblePasswords(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
-  };
+  // const togglePasswordVisibility = (id: Id<"passwords">) => {
+  //   setVisiblePasswords(prev => ({
+  //     ...prev,
+  //     [id]: !prev[id]
+  //   }));
+  // };
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
   };
 
-  const generatePassword = () => {
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
-    let password = "";
-    const array = new Uint8Array(16);
-    crypto.getRandomValues(array);
-    
-    for (let i = 0; i < 16; i++) {
-      password += charset[array[i] % charset.length];
+  // Modified toggle function to decrypt on first view
+  const togglePasswordVisibility = async (id: string) => {
+    // If already visible, just hide it
+    if (visiblePasswords[id]) {
+      setVisiblePasswords(prev => ({ ...prev, [id]: false }));
+      return;
     }
-    
-    setFormData(prev => ({ ...prev, password }));
+
+    // If not decrypted yet, decrypt it
+    if (!decryptedPasswords[id]) {
+      if (!encryptionKey) {
+        alert('Vault is locked. Please unlock first.');
+        return;
+      }
+
+      try {
+        const password = passwordsFromDB?.find(p => p._id === id);
+        if (!password) {
+          alert('Password not found');
+          return;
+        }
+
+        const decrypted = await EncryptionService.decrypt(
+          password.encryptedPassword,
+          encryptionKey,
+          password.iv
+        );
+
+        // Store the decrypted password
+        setDecryptedPasswords(prev => ({ ...prev, [id]: decrypted }));
+      } catch (error) {
+        console.error('Failed to decrypt password:', error);
+        alert('Failed to decrypt password. Please check your master password.');
+        return;
+      }
+    }
+
+    // Show the password
+    setVisiblePasswords(prev => ({ ...prev, [id]: true }));
   };
+
+  // Modified copy function to decrypt before copying
+  const copyPasswordToClipboard = async (id: string) => {
+    if (!encryptionKey) {
+      alert('Vault is locked. Please unlock first.');
+      return;
+    }
+
+    try {
+      // Check if already decrypted
+      let decrypted = decryptedPasswords[id];
+      
+      // If not, decrypt it
+      if (!decrypted) {
+        const password = passwordsFromDB?.find(p => p._id === id);
+        if (!password) {
+          alert('Password not found');
+          return;
+        }
+
+        decrypted = await EncryptionService.decrypt(
+          password.encryptedPassword,
+          encryptionKey,
+          password.iv
+        );
+
+        // Store for future use
+        setDecryptedPasswords(prev => ({ ...prev, [id]: decrypted }));
+      }
+
+      // Copy to clipboard
+      await navigator.clipboard.writeText(decrypted);
+      copyToClipboard(decrypted, 'Password');
+    } catch (error) {
+      console.error('Failed to copy password:', error);
+      alert('Failed to copy password.');
+    }
+  };
+
+    const generatePassword = () => {
+      const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
+      let password = "";
+      const array = new Uint8Array(16);
+      crypto.getRandomValues(array);
+      
+      for (let i = 0; i < 16; i++) {
+        password += charset[array[i] % charset.length];
+      }
+      
+      setFormData(prev => ({ ...prev, password }));
+    };
 
   const addPassword = useMutation(api.passwords.addPassword);
   const updatePassword = useMutation(api.passwords.updatePassword);
