@@ -120,3 +120,11 @@
     @apply bg-background text-foreground;
   }
 }
+
+.font-playfair {
+  font-family: var(--font-playfair);
+}
+
+.font-geist-sans {
+  font-family: var(--font-geist-sans);
+}
