@@ -2,6 +2,20 @@ import { ClerkProvider, UserButton } from '@clerk/nextjs'
 import './globals.css'
 import ConvexClerkProvider from './providers/ConvexClerkProvider'
 
+import { Inter, Playfair_Display } from 'next/font/google'
+
+const inter = Inter({ 
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
+const playfair = Playfair_Display({ 
+  subsets: ['latin'],
+  variable: '--font-playfair',
+  display: 'swap',
+})
+
 export default function RootLayout({
   children,
 }: {
@@ -27,8 +41,8 @@ export default function RootLayout({
       }}
     >
       <ConvexClerkProvider>
-        <html lang="en" suppressHydrationWarning>
-          <body className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" suppressHydrationWarning>
+        <html lang="en" suppressHydrationWarning className={`${inter.variable} ${playfair.variable}`}>
+          <body className={"bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 " + inter.className} suppressHydrationWarning>
             <header className="border-b border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
               <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                 
