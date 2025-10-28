@@ -65,6 +65,9 @@ export const updatePassword = mutation({
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    console.log('=== UPDATE PASSWORD MUTATION ===');
+    console.log('Args:', args);
+    
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Not authenticated");
@@ -72,6 +75,8 @@ export const updatePassword = mutation({
 
     // Optional: Verify the password belongs to the current user
     const existing = await ctx.db.get(args.id);
+    console.log('Existing password:', existing);
+    
     if (!existing || existing.userId !== identity.subject) {
       throw new Error("Password not found or unauthorized");
     }
@@ -85,6 +90,8 @@ export const updatePassword = mutation({
       notes: args.notes,
       updatedAt: Date.now(),
     });
+    
+    console.log('Password updated successfully');
 
     return args.id;
   },
