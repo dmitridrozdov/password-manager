@@ -176,7 +176,7 @@ export default function PasswordVaultDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   // const [visiblePasswords, setVisiblePasswords] = useState<Record<Id<"passwords">, boolean>>({});
   const [showAddModal, setShowAddModal] = useState(false);
-  const [editingId, setEditingId] = useState<Id<"passwords"> | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     website: '',
     username: '',
@@ -325,7 +325,7 @@ export default function PasswordVaultDashboard() {
     }
 
     try {
-      // Encrypt the password using the master password-derived key
+      // Always encrypt the password (whether new or edited)
       const { encrypted, iv } = await EncryptionService.encrypt(
         formData.password,
         encryptionKey
@@ -333,11 +333,11 @@ export default function PasswordVaultDashboard() {
 
       if (editingId) {
         await updatePassword({
-          id: editingId,
+          id: editingId as Id<"passwords">,
           website: formData.website,
           username: formData.username,
-          encryptedPassword: encrypted, // ← Now properly encrypted
-          iv: iv, // ← Now has the actual IV
+          encryptedPassword: encrypted,
+          iv: iv,
           category: formData.category,
           notes: formData.notes,
         });
@@ -345,8 +345,8 @@ export default function PasswordVaultDashboard() {
         await addPassword({
           website: formData.website,
           username: formData.username,
-          encryptedPassword: encrypted, // ← Now properly encrypted
-          iv: iv, // ← Now has the actual IV
+          encryptedPassword: encrypted,
+          iv: iv,
           category: formData.category,
           notes: formData.notes,
         });
@@ -384,17 +384,51 @@ export default function PasswordVaultDashboard() {
     }
   };
 
-  const handleEdit = (password: {
-    id: Id<"passwords">;
-    website: string;
-    username: string;
-    password: string;
-    category: string;
-    notes: string;
-  }) => {
-    setFormData(password);
-    setEditingId(password.id);
-    setShowAddModal(true);
+  const handleEdit = async (passwordId: string) => {
+    if (!encryptionKey) {
+      alert('Vault is locked. Please unlock first.');
+      return;
+    }
+
+    // Find the password from the database (which has encryptedPassword and iv)
+    const password = passwordsFromDB?.find(p => p._id === passwordId);
+    
+    if (!password) {
+      alert('Password not found');
+      return;
+    }
+
+    try {
+      let decryptedPassword: string;
+
+      // Check if already decrypted
+      if (decryptedPasswords[passwordId]) {
+        decryptedPassword = decryptedPasswords[passwordId];
+      } else {
+        // Decrypt it
+        decryptedPassword = await EncryptionService.decrypt(
+          password.encryptedPassword,
+          encryptionKey,
+          password.iv
+        );
+        
+        // Cache for future use
+        setDecryptedPasswords(prev => ({ ...prev, [passwordId]: decryptedPassword }));
+      }
+
+      setEditingId(passwordId);
+      setFormData({
+        website: password.website,
+        username: password.username,
+        password: decryptedPassword,
+        category: password.category,
+        notes: password.notes || '',
+      });
+      setShowAddModal(true);
+    } catch (error) {
+      console.error('Failed to decrypt password for editing:', error);
+      alert('Failed to decrypt password. Please make sure the vault is unlocked with the correct master password.');
+    }
   };
 
 const handleDelete = (id: Id<"passwords">) => {
@@ -506,14 +540,7 @@ const handleDelete = (id: Id<"passwords">) => {
                     </div>
                     <div className="flex gap-2">
                       <button
-                        onClick={() => handleEdit({
-                          id: pwd._id,
-                          website: pwd.website,
-                          username: pwd.username,
-                          password: pwd.encryptedPassword,
-                          category: pwd.category,
-                          notes: pwd.notes ?? ''
-                        })}
+                        onClick={() => handleEdit(pwd._id)}
                         className="p-2 text-slate-400 hover:text-blue-400 hover:bg-slate-700 rounded-lg transition-colors"
                       >
                         <Edit2 className="w-4 h-4" />
