@@ -312,7 +312,6 @@ export default function PasswordVaultDashboard() {
 
   const addPassword = useMutation(api.passwords.addPassword);
   const updatePassword = useMutation(api.passwords.updatePassword);
-
   const handleSubmit = async () => {
     if (!formData.website || !formData.username || !formData.password) {
       alert('Please fill in all required fields');
@@ -325,14 +324,22 @@ export default function PasswordVaultDashboard() {
     }
 
     try {
+      console.log('=== SUBMIT DEBUG ===');
+      console.log('Form data:', formData);
+      console.log('Editing ID:', editingId);
+      
       // Always encrypt the password (whether new or edited)
       const { encrypted, iv } = await EncryptionService.encrypt(
         formData.password,
         encryptionKey
       );
+      
+      console.log('Encrypted password:', encrypted);
+      console.log('IV:', iv);
 
       if (editingId) {
-        await updatePassword({
+        console.log('Updating password with ID:', editingId);
+        const result = await updatePassword({
           id: editingId as Id<"passwords">,
           website: formData.website,
           username: formData.username,
@@ -341,7 +348,9 @@ export default function PasswordVaultDashboard() {
           category: formData.category,
           notes: formData.notes,
         });
+        console.log('Update result:', result);
       } else {
+        console.log('Adding new password');
         await addPassword({
           website: formData.website,
           username: formData.username,
@@ -356,8 +365,8 @@ export default function PasswordVaultDashboard() {
       setEditingId(null);
       setFormData({ website: '', username: '', password: '', category: 'personal', notes: '' });
     } catch (error) {
+      console.error('Submit error:', error);
       alert('An error occurred while saving the password.');
-      console.error(error);
     }
   };
 
