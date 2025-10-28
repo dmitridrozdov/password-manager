@@ -80,6 +80,7 @@ export const updatePassword = mutation({
       website: args.website,
       username: args.username,
       encryptedPassword: args.encryptedPassword,
+      iv: args.iv,
       category: args.category,
       notes: args.notes,
       updatedAt: Date.now(),
@@ -89,7 +90,6 @@ export const updatePassword = mutation({
   },
 });
 
-// Delete a password
 // Delete a password
 export const deletePassword = mutation({
   args: {
