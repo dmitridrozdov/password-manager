@@ -324,22 +324,14 @@ export default function PasswordVaultDashboard() {
     }
 
     try {
-      console.log('=== SUBMIT DEBUG ===');
-      console.log('Form data:', formData);
-      console.log('Editing ID:', editingId);
-      
       // Always encrypt the password (whether new or edited)
       const { encrypted, iv } = await EncryptionService.encrypt(
         formData.password,
         encryptionKey
       );
-      
-      console.log('Encrypted password:', encrypted);
-      console.log('IV:', iv);
 
       if (editingId) {
-        console.log('Updating password with ID:', editingId);
-        const result = await updatePassword({
+        await updatePassword({
           id: editingId as Id<"passwords">,
           website: formData.website,
           username: formData.username,
@@ -348,9 +340,21 @@ export default function PasswordVaultDashboard() {
           category: formData.category,
           notes: formData.notes,
         });
-        console.log('Update result:', result);
+        
+        // Clear the cached decrypted password for this entry
+        setDecryptedPasswords(prev => {
+          const newCache = { ...prev };
+          delete newCache[editingId];
+          return newCache;
+        });
+        
+        // Hide the password if it was visible
+        setVisiblePasswords(prev => {
+          const newVisible = { ...prev };
+          delete newVisible[editingId];
+          return newVisible;
+        });
       } else {
-        console.log('Adding new password');
         await addPassword({
           website: formData.website,
           username: formData.username,
