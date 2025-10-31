@@ -473,14 +473,14 @@ const handleDelete = (id: Id<"passwords">) => {
         {/* --- LOCKED View: Only the Unlock Button --- */}
         {isVaultLocked && (
           <div className="text-center py-48">
-            <h1 className="text-4xl font-extrabold text-white mb-8 flex items-center justify-center gap-3">
+            <h1 className="text-4xl font-extrabold text-white mb-8 flex items-center justify-center gap-3 font-kanit">
               <Shield className="w-10 h-10 text-purple-600" />
               Password Vault
             </h1>
             <button
               onClick={() => { /* No action needed here, modal is already rendered */ }} 
               disabled // Disable the button to ensure unlock happens only through the modal
-              className="flex items-center gap-2 px-8 py-4 bg-purple-600 text-white text-xl font-semibold rounded-lg transition-colors shadow-lg opacity-80 cursor-default"
+              className="flex items-center gap-2 px-8 py-4 bg-purple-600 text-white text-xl font-semibold rounded-lg transition-colors shadow-lg opacity-80 cursor-default font-poppins"
             >
               <Lock className="w-6 h-6" />
               Unlock Vault
@@ -498,14 +498,14 @@ const handleDelete = (id: Id<"passwords">) => {
                   <Shield className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold text-white">Password Vault</h1>
-                  <p className="text-slate-400 text-sm">{passwords.length} passwords stored securely</p>
+                  <h1 className="text-3xl font-bold text-white font-kanit">Password Vault</h1>
+                  <p className="text-slate-400 text-sm font-poppins">{passwords.length} passwords stored securely</p>
                 </div>
               </div>
               <div className="flex gap-4">
                 <button
                   onClick={lockVault}
-                  className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors font-poppins"
                   title="Lock Vault"
                 >
                   <Lock className="w-5 h-5" />
@@ -513,7 +513,7 @@ const handleDelete = (id: Id<"passwords">) => {
                 </button>
                 <button
                   onClick={openAddModal}
-                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-poppins"
                 >
                   <Plus className="w-5 h-5" />
                   Add Password
@@ -530,7 +530,7 @@ const handleDelete = (id: Id<"passwords">) => {
                   placeholder="Search passwords..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 font-poppins"
                 />
               </div>
             </div>
