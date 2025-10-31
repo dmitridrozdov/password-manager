@@ -122,13 +122,25 @@
 }
 
 .font-playfair {
-  font-family: var(--font-playfair);
+  font-family: 'Playfair Display', serif;
 }
 
-.font-geist-sans {
-  font-family: var(--font-geist-sans);
+.font-inter {
+  font-family: 'Inter', sans-serif;
 }
 
 .font-kanit {
   font-family: 'kanit', sans-serif;
+}
+
+.font-poppins {
+  font-family: 'Poppins', sans-serif;
+}
+
+.font-montserrat {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.font-jetbrains-mono {
+  font-family: 'JetBrains Mono', monospace;
 }
