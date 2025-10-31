@@ -20,7 +20,7 @@ export default function LandingPage() {
                 <Shield className="w-16 h-16 text-blue-400" />
               </div>
             </div>
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight font-geist-sans">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight font-kanit">
               Secure Your Digital Life
             </h1>
             <p className="text-xl sm:text-2xl text-slate-300 max-w-3xl mx-auto mb-8">
