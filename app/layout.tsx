@@ -42,6 +42,14 @@ export default function RootLayout({
     >
       <ConvexClerkProvider>
         <html lang="en" suppressHydrationWarning className={`${inter.variable} ${playfair.variable}`}>
+          <head>
+            <link rel="preconnect" href="https://fonts.cdnfonts.com" />
+            <link
+              rel="stylesheet"
+              href="https://fonts.cdnfonts.com/css/kanit"
+              precedence="high"
+            />
+          </head>
           <body className={"bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 " + inter.className} suppressHydrationWarning>
             <header className="border-b border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
               <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
