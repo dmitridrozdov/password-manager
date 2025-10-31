@@ -545,8 +545,8 @@ const handleDelete = (id: Id<"passwords">) => {
                         <Globe className="w-6 h-6 text-purple-400" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-semibold text-white">{pwd.website}</h3>
-                        <span className={`inline-block px-2 py-1 text-xs rounded-full text-white mt-1 ${getCategoryColor(pwd.category)}`}>
+                        <h3 className="text-lg font-semibold text-white font-poppins">{pwd.website}</h3>
+                        <span className={`inline-block px-2 py-1 text-xs rounded-full text-white mt-1 font-poppins ${getCategoryColor(pwd.category)}`}>
                           {pwd.category}
                         </span>
                       </div>
@@ -570,7 +570,7 @@ const handleDelete = (id: Id<"passwords">) => {
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
                       <User className="w-4 h-4 text-slate-400" />
-                      <span className="text-slate-300 flex-1">{pwd.username}</span>
+                      <span className="text-slate-300 flex-1 font-poppins">{pwd.username}</span>
                       <button
                         onClick={() => copyToClipboard(pwd.username, 'Username')}
                         className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors"
@@ -579,28 +579,9 @@ const handleDelete = (id: Id<"passwords">) => {
                       </button>
                     </div>
 
-                    {/* <div className="flex items-center gap-3">
-                      <Lock className="w-4 h-4 text-slate-400" />
-                      <span className="text-slate-300 flex-1 font-mono">
-                        {visiblePasswords[pwd._id] ? pwd.encryptedPassword : '••••••••••••'}
-                      </span>
-                      <button
-                        onClick={() => togglePasswordVisibility(pwd._id)}
-                        className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors"
-                      >
-                        {visiblePasswords[pwd._id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                      <button
-                        onClick={() => copyToClipboard(pwd.encryptedPassword, 'Password')}
-                        className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors"
-                      >
-                        <CopyIcon result=''/>
-                      </button>
-                    </div> */}
-
                     <div className="flex items-center gap-3">
                       <Lock className="w-4 h-4 text-slate-400" />
-                      <span className="text-slate-300 flex-1 font-mono">
+                      <span className="text-slate-300 flex-1 font-mono font-poppins">
                         {visiblePasswords[pwd._id] 
                           ? (decryptedPasswords[pwd._id] || 'Decrypting...') 
                           : '••••••••••••'
@@ -622,7 +603,7 @@ const handleDelete = (id: Id<"passwords">) => {
 
                     {pwd.notes && (
                       <div className="mt-3 p-3 bg-slate-900/50 rounded-lg">
-                        <p className="text-sm text-slate-400">{pwd.notes}</p>
+                        <p className="text-sm text-slate-400 font-poppins">{pwd.notes}</p>
                       </div>
                     )}
                   </div>
