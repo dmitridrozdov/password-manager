@@ -49,6 +49,21 @@ export default function RootLayout({
               href="https://fonts.cdnfonts.com/css/kanit"
               precedence="high"
             />
+            <link
+              rel="stylesheet"
+              href="https://fonts.cdnfonts.com/css/playfair-display"
+              precedence="high"
+            />
+            <link
+              rel="stylesheet"
+              href="https://fonts.cdnfonts.com/css/inter"
+              precedence="high"
+            />
+            <link
+              rel="stylesheet"
+              href="https://fonts.cdnfonts.com/css/jetbrains-mono"
+              precedence="high"
+            />
           </head>
           <body className={"bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 " + inter.className} suppressHydrationWarning>
             <header className="border-b border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
