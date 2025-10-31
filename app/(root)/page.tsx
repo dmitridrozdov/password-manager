@@ -23,13 +23,13 @@ export default function LandingPage() {
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight font-kanit">
               Secure Your Digital Life
             </h1>
-            <p className="text-xl sm:text-2xl text-slate-300 max-w-3xl mx-auto mb-8 font-jetbrains-mono">
+            <p className="text-xl sm:text-2xl text-slate-300 max-w-3xl mx-auto mb-8 font-poppins">
               Store, manage, and access all your passwords in one encrypted vault. 
               Protected by military-grade encryption.
             </p>
             <a 
               href="/sign-in"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 font-poppins"
             >
               Get Started
               <Key className="w-5 h-5" />
@@ -42,8 +42,8 @@ export default function LandingPage() {
               <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-4">
                 <Lock className="w-6 h-6 text-blue-400" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">End-to-End Encryption</h3>
-              <p className="text-slate-400">
+              <h3 className="text-xl font-semibold text-white mb-3 font-poppins">End-to-End Encryption</h3>
+              <p className="text-slate-400 font-poppins">
                 Your passwords are encrypted with AES-256 encryption. Only you have the keys.
               </p>
             </div>
@@ -52,8 +52,8 @@ export default function LandingPage() {
               <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-4">
                 <Eye className="w-6 h-6 text-purple-400" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Zero Knowledge</h3>
-              <p className="text-slate-400">
+              <h3 className="text-xl font-semibold text-white mb-3 font-poppins">Zero Knowledge</h3>
+              <p className="text-slate-400 font-poppins">
                 We can't see your passwords. Your data is encrypted before it leaves your device.
               </p>
             </div>
@@ -62,8 +62,8 @@ export default function LandingPage() {
               <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mb-4">
                 <Smartphone className="w-6 h-6 text-green-400" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Access Anywhere</h3>
-              <p className="text-slate-400">
+              <h3 className="text-xl font-semibold text-white mb-3 font-poppins">Access Anywhere</h3>
+              <p className="text-slate-400 font-poppins">
                 Sync your passwords across all devices. Available on web, mobile, and desktop.
               </p>
             </div>
@@ -73,19 +73,19 @@ export default function LandingPage() {
           <div className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
               <div className="text-4xl font-bold text-blue-400 mb-2">256-bit</div>
-              <div className="text-slate-400">Encryption</div>
+              <div className="text-slate-400 font-poppins">Encryption</div>
             </div>
             <div>
               <div className="text-4xl font-bold text-purple-400 mb-2">100%</div>
-              <div className="text-slate-400">Private</div>
+              <div className="text-slate-400 font-poppins">Private</div>
             </div>
             <div>
               <div className="text-4xl font-bold text-green-400 mb-2">∞</div>
-              <div className="text-slate-400">Passwords</div>
+              <div className="text-slate-400 font-poppins">Passwords</div>
             </div>
             <div>
               <div className="text-4xl font-bold text-orange-400 mb-2">24/7</div>
-              <div className="text-slate-400">Protected</div>
+              <div className="text-slate-400 font-poppins">Protected</div>
             </div>
           </div>
 
@@ -93,15 +93,15 @@ export default function LandingPage() {
           <div className="mt-24 text-center">
             <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm border border-blue-500/30 rounded-3xl p-12">
               <FileCheck className="w-16 h-16 text-blue-400 mx-auto mb-6" />
-              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 font-poppins">
                 Ready to Take Control?
               </h2>
-              <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
+              {/* <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto font-poppins">
                 Join thousands of users who trust us with their digital security.
-              </p>
+              </p> */}
               <a 
                 href="/sign-in"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 font-poppins"
               >
                 Start Securing Now
                 <Key className="w-5 h-5" />
@@ -112,8 +112,8 @@ export default function LandingPage() {
       </div>
 
       {/* Footer */}
-      <footer className="relative border-t border-slate-800 py-8">
-        <div className="max-w-7xl mx-auto px-6 text-center text-slate-500">
+      <footer className="relative border-t border-slate-800 py-4">
+        <div className="max-w-7xl mx-auto px-6 text-center text-slate-500 font-poppins">
           <p>© 2025 Password Manager. Your security is our priority.</p>
         </div>
       </footer>
