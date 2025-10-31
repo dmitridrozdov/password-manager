@@ -128,3 +128,7 @@
 .font-geist-sans {
   font-family: var(--font-geist-sans);
 }
+
+.font-kanit {
+  font-family: 'kanit', sans-serif;
+}
