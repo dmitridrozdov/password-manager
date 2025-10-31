@@ -61,8 +61,8 @@ function MasterPasswordModal({ onUnlock }: { onUnlock: (password: string) => voi
       <div className="bg-slate-800 rounded-xl p-8 max-w-sm w-full border border-purple-600 shadow-2xl">
         <div className="flex flex-col items-center mb-6">
           <Shield className="w-10 h-10 text-purple-400 mb-3" />
-          <h2 className="text-2xl font-bold text-white">Unlock Vault</h2>
-          <p className="text-sm text-slate-400 mt-1">Enter your Master Password to proceed.</p>
+          <h2 className="text-2xl font-bold text-white font-poppins">Unlock Vault</h2>
+          <p className="text-sm text-slate-400 mt-1 font-poppins">Enter your Master Password to proceed.</p>
         </div>
 
         <div className="space-y-4">
@@ -74,7 +74,7 @@ function MasterPasswordModal({ onUnlock }: { onUnlock: (password: string) => voi
               onKeyDown={handleKeyDown}
               placeholder="Master Password"
               // Removed dynamic error border class
-              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 font-poppins"
             />
             <button
               onClick={() => setShowPassword(!showPassword)}
@@ -88,7 +88,7 @@ function MasterPasswordModal({ onUnlock }: { onUnlock: (password: string) => voi
           <button
             onClick={handleUnlock}
             disabled={!masterPassword}
-            className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
+            className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 font-poppins"
           >
             Unlock Vault
           </button>
