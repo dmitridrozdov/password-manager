@@ -623,7 +623,7 @@ const handleDelete = (id: Id<"passwords">) => {
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
                 <div className="bg-slate-800 rounded-xl p-6 max-w-md w-full border border-slate-700">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-white">
+                    <h2 className="text-2xl font-bold text-white font-poppins">
                       {editingId ? 'Edit Password' : 'Add New Password'}
                     </h2>
                     <button
@@ -636,7 +636,7 @@ const handleDelete = (id: Id<"passwords">) => {
 
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                      <label className="block text-sm font-medium text-slate-300 mb-2 font-poppins">
                         Website *
                       </label>
                       <input
@@ -644,12 +644,12 @@ const handleDelete = (id: Id<"passwords">) => {
                         value={formData.website}
                         onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
                         placeholder="example.com"
-                        className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 font-poppins"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                      <label className="block text-sm font-medium text-slate-300 mb-2 font-poppins">
                         Username *
                       </label>
                       <input
@@ -657,12 +657,12 @@ const handleDelete = (id: Id<"passwords">) => {
                         value={formData.username}
                         onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
                         placeholder="user@example.com"
-                        className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 font-poppins"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                      <label className="block text-sm font-medium text-slate-300 mb-2 font-poppins">
                         Password *
                       </label>
                       <div className="flex gap-2">
@@ -672,7 +672,7 @@ const handleDelete = (id: Id<"passwords">) => {
                             value={formData.password}
                             onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                             placeholder="Enter password"
-                            className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 font-poppins"
                           />
                           <button
                             onClick={() => setShowFormPassword(!showFormPassword)}
@@ -692,13 +692,13 @@ const handleDelete = (id: Id<"passwords">) => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                      <label className="block text-sm font-medium text-slate-300 mb-2 font-poppins">
                         Category
                       </label>
                       <select
                         value={formData.category}
                         onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                        className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 font-poppins"
                       >
                         <option value="personal">Personal</option>
                         <option value="work">Work</option>
@@ -708,7 +708,7 @@ const handleDelete = (id: Id<"passwords">) => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                      <label className="block text-sm font-medium text-slate-300 mb-2 font-poppins">
                         Notes (optional)
                       </label>
                       <textarea
@@ -716,7 +716,7 @@ const handleDelete = (id: Id<"passwords">) => {
                         onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
                         placeholder="Add any additional notes..."
                         rows={3}
-                        className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                        className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none font-poppins"
                       />
                     </div>
                   </div>
@@ -724,13 +724,13 @@ const handleDelete = (id: Id<"passwords">) => {
                   <div className="flex gap-3 mt-6">
                     <button
                       onClick={() => setShowAddModal(false)}
-                      className="flex-1 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+                      className="flex-1 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors font-poppins"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleSubmit}
-                      className="flex-1 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                      className="flex-1 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-poppins"
                     >
                       {editingId ? 'Update' : 'Add'} Password
                     </button>
